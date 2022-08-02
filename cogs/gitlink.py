@@ -42,13 +42,7 @@ class Delete(discord.ui.View):
         self.user = user
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if self.user.bot:
-            # since, we aren't blacklisting the bot, L#252
-            # so Delete view works globally
-            return True
-        if self.user.id != interaction.user.id:  # type: ignore
-            return False
-        return True
+        return True if self.user.bot else self.user.id == interaction.user.id
 
     @discord.ui.button(label="Delete", style=discord.ButtonStyle.red)
     async def delete(
@@ -125,10 +119,11 @@ class GitLink(Cog):
     ) -> str:
         """Fetches a snippet from a GitHub gist."""
         gist_json = await self._fetch_response(
-            f'https://api.github.com/gists/{gist_id}{f"/{revision}" if len(revision) > 0 else ""}',
+            f'https://api.github.com/gists/{gist_id}{f"/{revision}" if revision != "" else ""}',
             "json",
             headers=GITHUB_HEADERS,
         )
+
 
         # Check each file in the gist for the specified file
         for gist_file in gist_json["files"]:

@@ -44,12 +44,8 @@ class General(Cog):
         self, message_id: int, *, fetch: bool=False, partial: bool=False, cache: bool=True, guild: discord.Guild
     ) -> Union[discord.Message, discord.PartialMessage]:
         """Fastest way to get the messages from cache or fetch them from the API."""
-        try:
+        with suppress(KeyError):
             return self.message[message_id]
-            # try except is better than if-else, in this case
-        except KeyError:
-            pass
-
         if cache:
             for msg in self.bot.cached_messages:
                 if msg.id == message_id:
@@ -258,7 +254,13 @@ class General(Cog):
             repo = repo or "pycord"
             return f"https://github.com/{org}/{repo}/pull/{index}"
 
-        links = list(set([make_link(index, org, repo) for org, repo, index in PULL_HASH_REGEX.findall(message.content)]))[:15]
+        links = list(
+            {
+                make_link(index, org, repo)
+                for org, repo, index in PULL_HASH_REGEX.findall(message.content)
+            }
+        )[:15]
+
         if len(links) > 2:
             links = [f"<{link}>" for link in links]
         if links:

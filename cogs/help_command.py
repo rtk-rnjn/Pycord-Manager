@@ -7,7 +7,7 @@ COLOR = discord.Color.blurple()
 async def get_cog_help(cog: commands.Cog, ctx: commands.Context) -> discord.Embed:
     cog = ctx.bot.get_cog(cog)
     embed = discord.Embed(color=COLOR)
-    embed.title = cog.__cog_name__ + " Commands"
+    embed.title = f"{cog.__cog_name__} Commands"
     embed.description = "\n".join(
         f"`{command.name}`: {command.help}"
         for command in cog.get_commands()
